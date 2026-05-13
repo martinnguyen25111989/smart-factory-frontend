@@ -1,0 +1,43 @@
+<div class="page">
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1>📍 Zones</h1>
+      <p>Monitor PPE compliance across factory zones</p>
+    </div>
+    <button class="btn-refresh" (click)="load()">↻ Refresh</button>
+  </div>
+
+  <!-- Content -->
+  <div class="loading" *ngIf="loading">
+    <div class="spinner"></div> Loading zones…
+  </div>
+  <ng-container *ngIf="!loading">
+    <div class="card">
+      <div class="zones-grid" *ngIf="zones.length">
+        <div class="zone-card" *ngFor="let zone of zones; trackBy: trackByZoneId">
+          <div class="zone-header">
+            <div class="zone-name">{{zone.name}}</div>
+            <span class="zone-badge" [class]="'badge-' + zone.status">
+              {{zone.status | uppercase}}
+            </span>
+          </div>
+          <div class="zone-info">
+            <div class="info-row">
+              <span class="info-label">Workers:</span>
+              <span class="info-value">{{zone.workers}}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Alerts:</span>
+              <span class="info-value">{{zone.alerts}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="empty" *ngIf="!zones.length">
+        <div class="ico">📍</div>
+        <p>No zones found</p>
+      </div>
+    </div>
+  </ng-container>
+</div>

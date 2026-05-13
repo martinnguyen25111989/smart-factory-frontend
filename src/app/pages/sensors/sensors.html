@@ -1,0 +1,70 @@
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1>📡 Live Sensor Feed</h1>
+      <p>Real-time PPE detection events via WebSocket</p>
+    </div>
+    <div class="header-actions">
+      <div class="conn-badge" [class.on]="connected" [class.off]="!connected">
+        <span class="conn-dot" [class.on]="connected" [class.off]="!connected"></span>
+        {{connected ? 'Connected' : 'Disconnected'}}
+      </div>
+      <button class="btn btn-clear" (click)="clearFeed()">🗑 Clear</button>
+      <button class="btn" [class.btn-stop]="connected" [class.btn-start]="!connected"
+        (click)="connected ? disconnect() : connect()">
+        {{connected ? '⏹ Disconnect' : '▶ Connect'}}
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-pill" *ngFor="let s of stats; trackBy: trackByStatKey">
+      <span class="sev-dot" [style.background]="s.color"></span>
+      <div>
+        <div class="sev-label">{{s.key}}</div>
+        <div class="sev-count" [style.color]="s.color">{{s.count}}</div>
+      </div>
+    </div>
+    <div class="total-pill">
+      <span class="lbl">Total events</span>
+      <span class="num">{{feed.length}}</span>
+    </div>
+  </div>
+
+  <!-- Feed -->
+  <div class="feed-container">
+    <div class="feed-header">
+      <span class="stream-dot" [style.animation]="connected ? 'pulse 1.5s infinite' : 'none'"></span>
+      <span class="title">Event Stream</span>
+      <span class="sub">({{feed.length}} events — max 100)</span>
+    </div>
+
+    <div class="feed-list">
+      <div class="empty" *ngIf="!feed.length">
+        <div class="ico">📭</div>
+        <div class="msg">Waiting for sensor events…</div>
+        <div class="hint">Make sure sensors are publishing to Kafka → sensor-events topic</div>
+      </div>
+
+      <div class="feed-item sev-{{item.severity}}" *ngFor="let item of feed; trackBy: trackByItemId" [class.is-new]="item.isNew">
+        <div class="item-left">
+          <div class="item-row1">
+            <span class="badge badge-{{item.severity}}">{{item.severity}}</span>
+            <span class="item-type">{{formatType(item.alert_type)}}</span>
+            <span class="new-tag" *ngIf="item.isNew">NEW</span>
+          </div>
+          <div class="item-desc">{{item.description || 'No description'}}</div>
+          <div class="item-zone">📍 Zone: {{item.zone_id ? item.zone_id.slice(0,8)+'…' : 'Unknown'}}</div>
+        </div>
+        <div class="item-right">
+          <div class="item-time">{{item.time | date:'HH:mm:ss'}}</div>
+          <div class="item-date">{{item.time | date:'MMM d'}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

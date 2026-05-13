@@ -1,0 +1,105 @@
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1>🔔 Alert Management</h1>
+      <p>Review, acknowledge and resolve PPE violation alerts</p>
+    </div>
+    <button class="btn-refresh" (click)="load()">↻ Refresh</button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+
+    <div class="filter-group">
+      <button class="filter-btn" [class.active]="filterStatus===''"
+        (click)="setStatus('')">All</button>
+      <button class="filter-btn" [class.active]="filterStatus==='open'"
+        (click)="setStatus('open')">🟡 Open</button>
+      <button class="filter-btn" [class.active]="filterStatus==='acknowledged'"
+        (click)="setStatus('acknowledged')">🔵 Acknowledged</button>
+      <button class="filter-btn" [class.active]="filterStatus==='resolved'"
+        (click)="setStatus('resolved')">🟢 Resolved</button>
+    </div>
+
+    <div class="filter-sep"></div>
+
+    <div class="filter-group">
+      <button class="filter-btn" [class.active]="filterSeverity===''"
+        (click)="setSeverity('')">All severity</button>
+      <button class="filter-btn" [class.active]="filterSeverity==='critical'"
+        (click)="setSeverity('critical')">🔴 Critical</button>
+      <button class="filter-btn" [class.active]="filterSeverity==='high'"
+        (click)="setSeverity('high')">🟠 High</button>
+      <button class="filter-btn" [class.active]="filterSeverity==='medium'"
+        (click)="setSeverity('medium')">🔵 Medium</button>
+      <button class="filter-btn" [class.active]="filterSeverity==='low'"
+        (click)="setSeverity('low')">🟢 Low</button>
+    </div>
+
+    <span class="count-badge">{{totalAlerts}} alerts</span>
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div> Loading alerts…
+  </div>
+  <ng-container *ngIf="!loading">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Severity</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Zone</th>
+            <th>Time</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let a of alerts; trackBy: trackByAlertId">
+            <td><span class="badge badge-{{a.severity}}">{{a.severity}}</span></td>
+            <td class="cell-type">{{formatType(a.alert_type)}}</td>
+            <td class="cell-desc">{{a.description || '—'}}</td>
+            <td><span class="badge badge-{{a.status}}">{{a.status}}</span></td>
+            <td class="cell-zone">{{a.zone_id ? a.zone_id.slice(0,8)+'…' : '—'}}</td>
+            <td class="cell-time">{{a.created_at | date:'MMM d, HH:mm'}}</td>
+            <td>
+              <div class="actions">
+                <button class="act-btn act-ack" (click)="acknowledge(a)" *ngIf="a.status === 'open'">👍 Ack</button>
+                <button class="act-btn act-done" (click)="resolve(a)" *ngIf="a.status !== 'resolved'">✓ Resolve</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="empty" *ngIf="!alerts.length">
+        <div class="ico">🎉</div>
+        <p>No alerts found</p>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="totalPages > 1">
+      <button class="pag-btn" [disabled]="currentPage === 1" (click)="prevPage()">← Prev</button>
+      
+      <div class="pag-buttons">
+        <button class="pag-btn" *ngFor="let page of getPageNumbers(); trackBy: trackByPage" 
+          [class.active]="currentPage === page" (click)="goToPage(page)">
+          {{page}}
+        </button>
+      </div>
+
+      <button class="pag-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">Next →</button>
+      
+      <div class="pag-info">
+        Page {{currentPage}} of {{totalPages}}
+      </div>
+    </div>
+  </ng-container>
+
+</div>

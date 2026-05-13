@@ -1,0 +1,35 @@
+<div class="page">
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1>📊 Reports</h1>
+      <p>Analytics and compliance reporting</p>
+    </div>
+    <button class="btn-refresh" (click)="load()">↻ Refresh</button>
+  </div>
+
+  <!-- Content -->
+  <div class="loading" *ngIf="loading">
+    <div class="spinner"></div> Loading reports…
+  </div>
+  <ng-container *ngIf="!loading">
+    <div class="card">
+      <div class="reports-list" *ngIf="reports.length">
+        <div class="report-item" *ngFor="let report of reports; trackBy: trackByReportId">
+          <div class="report-header">
+            <div class="report-title">{{report.title}}</div>
+            <span class="report-date">{{report.date | date:'MMM d, yyyy'}}</span>
+          </div>
+          <div class="report-details">
+            <span class="detail-badge">{{report.type}}</span>
+            <span class="detail-count">{{report.events}} events</span>
+          </div>
+        </div>
+      </div>
+      <div class="empty" *ngIf="!reports.length">
+        <div class="ico">📊</div>
+        <p>No reports available</p>
+      </div>
+    </div>
+  </ng-container>
+</div>

@@ -1,0 +1,39 @@
+<div class="page">
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1>👥 Workers</h1>
+      <p>Manage and monitor PPE compliance for factory workers</p>
+    </div>
+    <button class="btn-refresh" (click)="load()">↻ Refresh</button>
+  </div>
+
+  <!-- Content -->
+  <div class="loading" *ngIf="loading">
+    <div class="spinner"></div> Loading workers…
+  </div>
+  <ng-container *ngIf="!loading">
+    <div class="card">
+      <div class="workers-grid" *ngIf="workers.length">
+        <div class="worker-card" *ngFor="let worker of workers; trackBy: trackByWorkerId">
+          <div class="worker-header">
+            <div class="worker-avatar">{{worker.name.charAt(0).toUpperCase()}}</div>
+            <div class="worker-info">
+              <div class="worker-name">{{worker.name}}</div>
+              <div class="worker-id">ID: {{worker.id.slice(0, 8)}}…</div>
+            </div>
+          </div>
+          <div class="worker-status">
+            <span class="status-badge" [class]="'status-' + worker.status">
+              {{worker.status | uppercase}}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="empty" *ngIf="!workers.length">
+        <div class="ico">👥</div>
+        <p>No workers found</p>
+      </div>
+    </div>
+  </ng-container>
+</div>
