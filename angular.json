@@ -2,11 +2,12 @@
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
   "cli": {
-    "packageManager": "npm"
+    "packageManager": "npm",
+    "analytics": "a0bebc3e-3b21-48b9-8f13-a53a1b9459b7"
   },
   "newProjectRoot": "projects",
   "projects": {
-    "my-app": {
+    "smart-factory-frontend": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -61,10 +62,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "my-app:build:production"
+              "buildTarget": "smart-factory-frontend:build:production"
             },
             "development": {
-              "buildTarget": "my-app:build:development"
+              "buildTarget": "smart-factory-frontend:build:development"
             }
           },
           "defaultConfiguration": "development"
