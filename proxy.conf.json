@@ -1,0 +1,51 @@
+{
+  "/api/alerts": {
+    "target": "http://localhost:8001",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api/alerts": "/api/alerts"
+    }
+  },
+  "/ws/alerts": {
+    "target": "ws://localhost:8001",
+    "secure": false,
+    "changeOrigin": true,
+    "ws": true,
+    "pathRewrite": {
+      "^/ws/alerts": "/ws/alerts"
+    }
+  },
+  "/api/workers": {
+    "target": "http://localhost:8002",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api/workers": "/api/workers"
+    }
+  },
+  "/api/zones": {
+    "target": "http://localhost:8002",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api/zones": "/api/zones"
+    }
+  },
+  "/api/shifts": {
+    "target": "http://localhost:8002",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api/shifts": "/api/shifts"
+    }
+  },
+  "/api/reports": {
+    "target": "http://localhost:8003",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api/reports": "/api/reports"
+    }
+  }
+}

@@ -1,4 +1,4 @@
-# MyApp
+# Smart-Factory-FrontEnd
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.3.
 
@@ -57,3 +57,23 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+```Payload Demo Sensor Camera
+{
+  "event_id": "test-100",
+  "event_type": "camera",
+  "source": "cam",
+  "timestamp": "2026-05-12T03:30:00Z",
+  "payload": {
+    "event_type": "camera",
+    "zone_id": "a8e1fd3b-d022-45d7-bb67-52e2ba88307c",
+    "worker_id": "d2737f3d-bd72-461e-a1df-d8fe3b13c742",
+    "ppe_detected": {
+      "helmet": false,
+      "vest": true,
+      "gloves": false
+    },
+    "confidence": 0.95
+  }
+}
+```

@@ -29,7 +29,7 @@ private auth    = inject(AuthService);
     if (this.form.invalid) return;
     this.loading = true;
     const { email, password } = this.form.value;
-    console.log(this.form.value);
+    //console.log(this.form.value);
     this.auth.login({ email: email!, password: password! }).subscribe({
       next: () => this.router.navigate(['/dashboard']),
       error: err => {

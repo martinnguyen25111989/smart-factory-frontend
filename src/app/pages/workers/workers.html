@@ -1,39 +1,133 @@
 <div class="page">
+
   <!-- Header -->
   <div class="header">
     <div>
-      <h1>👥 Workers</h1>
-      <p>Manage and monitor PPE compliance for factory workers</p>
+      <h1>👷 Worker Management</h1>
+      <p>Manage factory workers, roles and zone assignments</p>
     </div>
-    <button class="btn-refresh" (click)="load()">↻ Refresh</button>
+    <button class="btn-add" (click)="openCreate()">＋ Add Worker</button>
   </div>
 
-  <!-- Content -->
-  <div class="loading" *ngIf="loading">
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">
     <div class="spinner"></div> Loading workers…
   </div>
-  <ng-container *ngIf="!loading">
-    <div class="card">
-      <div class="workers-grid" *ngIf="workers.length">
-        <div class="worker-card" *ngFor="let worker of workers; trackBy: trackByWorkerId">
-          <div class="worker-header">
-            <div class="worker-avatar">{{worker.name.charAt(0).toUpperCase()}}</div>
-            <div class="worker-info">
-              <div class="worker-name">{{worker.name}}</div>
-              <div class="worker-id">ID: {{worker.id.slice(0, 8)}}…</div>
+
+  <!-- Table -->
+  <div *ngIf="!loading" class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Worker</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Zone</th>
+          <th>Shift</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let w of workers">
+          <td>
+            <div class="avatar-cell">
+              <div class="avatar">{{w.full_name[0]}}</div>
+              <div>
+                <div class="worker-name">{{w.full_name}}</div>
+                <div class="worker-id">{{w.employee_id}}</div>
+              </div>
             </div>
-          </div>
-          <div class="worker-status">
-            <span class="status-badge" [class]="'status-' + worker.status">
-              {{worker.status | uppercase}}
+          </td>
+          <td class="worker-email">{{w.email}}</td>
+          <td>
+            <span class="badge"
+              [class.role-admin]="w.role==='admin'"
+              [class.role-supervisor]="w.role==='supervisor'"
+              [class.role-worker]="w.role==='worker'">
+              {{w.role}}
             </span>
+          </td>
+          <td>{{zoneName(w.zone_id)}}</td>
+          <td>{{shiftName(w.shift_id)}}</td>
+          <td>
+            <span class="badge"
+              [class.status-active]="w.is_active"
+              [class.status-inactive]="!w.is_active">
+              {{w.is_active ? '● Active' : '○ Inactive'}}
+            </span>
+          </td>
+          <td>
+            <button class="act-btn btn-edit" (click)="openEdit(w)">✏ Edit</button>
+            <button class="act-btn btn-deact" (click)="deactivate(w)" [disabled]="!w.is_active">✕ Deactivate</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div *ngIf="!workers.length" class="empty">No workers found</div>
+  </div>
+
+  <!-- Dialog -->
+  <div class="overlay" *ngIf="showDialog" (click)="closeDialog()">
+    <div class="dialog" (click)="$event.stopPropagation()">
+
+      <div class="dialog-header">
+        <div class="dialog-title">{{editMode ? '✏ Edit Worker' : '＋ Add Worker'}}</div>
+        <button class="btn-close" (click)="closeDialog()">×</button>
+      </div>
+
+      <form [formGroup]="form">
+        <div class="form-grid">
+          <div class="field">
+            <label>Employee ID</label>
+            <input formControlName="employee_id" placeholder="EMP001">
+          </div>
+          <div class="field">
+            <label>Full Name</label>
+            <input formControlName="full_name" placeholder="Nguyen Van A">
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <input type="email" formControlName="email" placeholder="worker@factory.com">
+          </div>
+          <div class="field" *ngIf="!editMode">
+            <label>Password</label>
+            <input type="password" formControlName="password" placeholder="••••••••">
+          </div>
+          <div class="field">
+            <label>Role</label>
+            <select formControlName="role">
+              <option value="worker">Worker</option>
+              <option value="supervisor">Supervisor</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Zone</label>
+            <select formControlName="zone_id">
+              <option value="">None</option>
+              <option *ngFor="let z of zones" [value]="z.id">{{z.name}}</option>
+            </select>
+          </div>
+          <div class="field span2">
+            <label>Shift</label>
+            <select formControlName="shift_id">
+              <option value="">None</option>
+              <option *ngFor="let s of shifts" [value]="s.id">
+                {{s.name}} ({{s.start_time}} – {{s.end_time}})
+              </option>
+            </select>
           </div>
         </div>
-      </div>
-      <div class="empty" *ngIf="!workers.length">
-        <div class="ico">👥</div>
-        <p>No workers found</p>
-      </div>
+
+        <div class="dialog-footer">
+          <button class="btn-cancel" (click)="closeDialog()">Cancel</button>
+          <button class="btn-save" (click)="save()" [disabled]="form.invalid">
+            {{editMode ? 'Update' : 'Create'}}
+          </button>
+        </div>
+      </form>
     </div>
-  </ng-container>
+  </div>
+
 </div>

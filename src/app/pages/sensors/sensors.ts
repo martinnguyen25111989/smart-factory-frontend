@@ -36,12 +36,16 @@ export class Sensors implements OnInit, OnDestroy {
 
   connect(): void {
     const ws = this.alertSvc.connectWs();
+    this.connected = true;
     this.cdr.markForCheck();
     this.sub = ws.subscribe({
-      next: (msg: any) => this.onMessage(msg),
+      next: (msg: any) => {
+        this.onMessage(msg);
+      },
       error: () => { this.connected = false; this.cdr.markForCheck(); },
       complete: () => { this.connected = false; this.cdr.markForCheck(); }
     });
+    
   }
 
   disconnect(): void {
@@ -81,6 +85,7 @@ export class Sensors implements OnInit, OnDestroy {
       const osc = ctx.createOscillator();
       osc.connect(ctx.destination);
       osc.frequency.value = 880;
+      console.log('Playing alert sound ', osc);
       osc.start(); setTimeout(() => osc.stop(), 200);
     } catch {}
   }

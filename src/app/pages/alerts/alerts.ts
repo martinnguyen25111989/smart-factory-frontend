@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -11,6 +11,7 @@ import { Alert } from '../../core/models/models';
   imports: [CommonModule, FormsModule, MatSnackBarModule],
   templateUrl: './alerts.html',
   styleUrl: './alerts.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
 export class Alerts implements OnInit {
@@ -30,8 +31,8 @@ export class Alerts implements OnInit {
 
   ngOnInit(): void { this.load(); }
 
-  setStatus(s: string):   void { this.filterStatus   = s; this.currentPage = 1; this.load(); }
-  setSeverity(s: string): void { this.filterSeverity = s; this.currentPage = 1; this.load(); }
+  setStatus(s: string):   void { this.filterStatus   = s; this.currentPage = 1; this.cdr.markForCheck(); this.load(); }
+  setSeverity(s: string): void { this.filterSeverity = s; this.currentPage = 1; this.cdr.markForCheck(); this.load(); }
 
   load(): void {
     this.loading = true;
@@ -66,6 +67,7 @@ export class Alerts implements OnInit {
   goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
+      this.cdr.markForCheck();
       window.scrollTo({ top: 0, behavior: 'smooth' });
       this.load();
     }
@@ -103,15 +105,15 @@ export class Alerts implements OnInit {
     const userId = this.authSvc.currentUser?.id;
     if (!userId) return;
     this.alertSvc.acknowledge(alert.id, userId.toString()).subscribe({
-      next: () => { this.snack.open('✓ Acknowledged', '', { duration: 2000 }); this.load(); },
-      error: () => this.snack.open('Failed', '', { duration: 2000 })
+      next: () => { this.snack.open('✓ Acknowledged', '', { duration: 2000 }); this.load(); this.cdr.markForCheck(); },
+      error: () => { this.snack.open('Failed', '', { duration: 2000 }); this.cdr.markForCheck(); }
     });
   }
 
   resolve(alert: Alert): void {
     this.alertSvc.resolve(alert.id).subscribe({
-      next: () => { this.snack.open('✓ Resolved', '', { duration: 2000 }); this.load(); },
-      error: () => this.snack.open('Failed', '', { duration: 2000 })
+      next: () => { this.snack.open('✓ Resolved', '', { duration: 2000 }); this.load(); this.cdr.markForCheck(); },
+      error: () => { this.snack.open('Failed', '', { duration: 2000 }); this.cdr.markForCheck(); }
     });
   }
 
