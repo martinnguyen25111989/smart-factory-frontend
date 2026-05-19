@@ -136,8 +136,8 @@
           </div>
 
           <div class="dialog-footer">
-            <button class="btn-cancel" (click)="closeDialog()">Cancel</button>
-            <button class="btn-save" (click)="save()" [disabled]="form.invalid">
+            <button type="button" class="btn-cancel" (click)="closeDialog()">Cancel</button>
+            <button type="button" class="btn-save" (click)="save()" [disabled]="form.invalid">
               {{editMode ? 'Update' : 'Create'}}
             </button>
           </div>

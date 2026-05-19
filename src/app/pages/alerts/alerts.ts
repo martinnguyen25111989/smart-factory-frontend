@@ -2,7 +2,8 @@ import { Component, inject, OnInit, ChangeDetectorRef, ChangeDetectionStrategy }
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { AlertService } from '../../core/services/api.services';
+import { forkJoin } from 'rxjs';
+import { AlertService, WorkerService } from '../../core/services/api.services';
 import { AuthService } from '../../core/services/auth.service';
 import { Alert } from '../../core/models/models';
 
@@ -15,21 +16,38 @@ import { Alert } from '../../core/models/models';
 })
 
 export class Alerts implements OnInit {
-  private alertSvc = inject(AlertService);
-  private authSvc  = inject(AuthService);
-  private snack    = inject(MatSnackBar);
-  private cdr      = inject(ChangeDetectorRef);
+  private alertSvc  = inject(AlertService);
+  private workerSvc = inject(WorkerService);
+  private authSvc   = inject(AuthService);
+  private snack     = inject(MatSnackBar);
+  private cdr       = inject(ChangeDetectorRef);
 
   alerts: Alert[] = [];
   loading = false;
   filterStatus   = '';
   filterSeverity = '';
-  
+
+  workerNames: Record<string, string> = {};
+  zoneNames:   Record<string, string> = {};
+
   pageSize = 10;
   currentPage = 1;
   totalAlerts = 0;
 
-  ngOnInit(): void { this.load(); }
+  ngOnInit(): void {
+    forkJoin({
+      workers: this.workerSvc.list(1000),
+      zones:   this.workerSvc.zones(),
+    }).subscribe(({ workers, zones }) => {
+      this.workerNames = Object.fromEntries(workers.map(w => [w.id, w.full_name]));
+      this.zoneNames   = Object.fromEntries(zones.map(z => [z.id, z.name]));
+      this.cdr.markForCheck();
+    });
+    this.load();
+  }
+
+  workerName(id: string | null): string { return id ? (this.workerNames[id] ?? '—') : '—'; }
+  zoneName(id: string | null):   string { return id ? (this.zoneNames[id]   ?? '—') : '—'; }
 
   setStatus(s: string):   void { this.filterStatus   = s; this.currentPage = 1; this.cdr.markForCheck(); this.load(); }
   setSeverity(s: string): void { this.filterSeverity = s; this.currentPage = 1; this.cdr.markForCheck(); this.load(); }

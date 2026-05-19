@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData } from 'chart.js';
 import { Subscription, interval } from 'rxjs';
-import { AlertService, ReportService } from '../../core/services/api.services';
+import { AlertService, ReportService, WorkerService } from '../../core/services/api.services';
 import { Alert, AlertSummary } from '../../core/models/models';
 
 @Component({
@@ -16,12 +16,14 @@ import { Alert, AlertSummary } from '../../core/models/models';
 export class Dashboard implements OnInit, OnDestroy {
   private reportSvc = inject(ReportService);
   private alertSvc  = inject(AlertService);
+  private workerSvc = inject(WorkerService);
   private cdr = inject(ChangeDetectorRef);
   private subs = new Subscription();
 
   summary: AlertSummary | null = null;
   recentAlerts: Alert[] = [];
   liveCount = 0;
+  workerNames: Record<string, string> = {};
 
   trendData: ChartData<'line'> = {
     labels: [],
@@ -55,6 +57,10 @@ export class Dashboard implements OnInit, OnDestroy {
   };
 
   ngOnInit(): void {
+    this.workerSvc.list(1000).subscribe(workers => {
+      this.workerNames = Object.fromEntries(workers.map(w => [w.id, w.full_name]));
+      this.cdr.markForCheck();
+    });
     this.load();
     // Auto-refresh every 30s
     this.subs.add(interval(30000).subscribe(() => this.load()));
@@ -84,7 +90,7 @@ export class Dashboard implements OnInit, OnDestroy {
     });
     this.reportSvc.byZone(7).subscribe(z => {
       this.zoneData = {
-        labels: z.map(x => x.zone),
+        labels: z.map(x => x.zone_name),
         datasets: [{ data: z.map(x => x.count), backgroundColor: ['#4f52e8','#f59e0b','#ef4444','#22c55e','#3b82f6','#ec4899'], borderWidth: 0 }]
       };
       this.cdr.markForCheck();
@@ -93,6 +99,10 @@ export class Dashboard implements OnInit, OnDestroy {
 
   formatType(t: string): string {
     return t.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  }
+
+  workerName(id: string | null): string {
+    return id ? (this.workerNames[id] ?? '—') : '—';
   }
 
   trackByAlertId(index: number, alert: Alert): string {

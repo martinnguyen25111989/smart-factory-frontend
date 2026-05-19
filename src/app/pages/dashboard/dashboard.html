@@ -87,6 +87,7 @@
           <div class="feed-type">
             <span class="badge badge-{{a.severity}}" style="margin-right:8px">{{a.severity}}</span>
             {{formatType(a.alert_type)}}
+            <span class="feed-worker">👤 {{workerName(a.worker_id)}}</span>
           </div>
           <div class="feed-desc">{{a.description}}</div>
         </div>

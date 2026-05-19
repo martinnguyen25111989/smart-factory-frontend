@@ -8,6 +8,9 @@ interface FeedItem {
   severity: string;
   description: string;
   zone_id: string;
+  zone_name: string;
+  worker_id: string;
+  full_name: string;
   time: Date;
   isNew: boolean;
 }
@@ -18,8 +21,8 @@ interface FeedItem {
   styleUrl: './sensors.scss',
 })
 export class Sensors implements OnInit, OnDestroy {
-  private alertSvc = inject(AlertService);
-  private cdr      = inject(ChangeDetectorRef);
+  private alertSvc  = inject(AlertService);
+  private cdr       = inject(ChangeDetectorRef);
   private sub?: Subscription;
 
   connected = false;
@@ -32,16 +35,16 @@ export class Sensors implements OnInit, OnDestroy {
     { key: 'low',      color: '#4ade80', count: 0 },
   ];
 
-  ngOnInit(): void { this.connect(); }
+  ngOnInit(): void {
+    this.connect();
+  }
 
   connect(): void {
     const ws = this.alertSvc.connectWs();
     this.connected = true;
     this.cdr.markForCheck();
     this.sub = ws.subscribe({
-      next: (msg: any) => {
-        this.onMessage(msg);
-      },
+      next: (msg: any) => this.onMessage(msg),
       error: () => { this.connected = false; this.cdr.markForCheck(); },
       complete: () => { this.connected = false; this.cdr.markForCheck(); }
     });
@@ -62,12 +65,17 @@ export class Sensors implements OnInit, OnDestroy {
   }
 
   private onMessage(msg: any): void {
+    if (!msg || (!msg.alert_id && !msg.alert_type && !msg.id)) return;
+    const alertId = msg.alert_id || msg.id;
     const item: FeedItem = {
-      id:          msg.alert_id || Date.now().toString(),
+      id:          alertId || Date.now().toString(),
       alert_type:  msg.alert_type  || 'unknown',
       severity:    msg.severity    || 'low',
       description: msg.description || '',
       zone_id:     msg.zone_id     || '',
+      zone_name:   msg.zone_name   || '',
+      worker_id:   msg.worker_id   || '',
+      full_name:   msg.full_name   || '',
       time:        new Date(),
       isNew:       true
     };
@@ -77,6 +85,20 @@ export class Sensors implements OnInit, OnDestroy {
     this.cdr.markForCheck();
     setTimeout(() => { item.isNew = false; this.cdr.markForCheck(); }, 3000);
     if (item.severity === 'critical') this.playAlert();
+
+    // Fallback: hydrate from REST when WS payload missed full_name / zone_name
+    if (alertId && (!item.full_name || !item.zone_name)) {
+      this.alertSvc.get(alertId).subscribe({
+        next: (a: any) => {
+          item.full_name = a?.full_name ?? item.full_name;
+          item.zone_name = a?.zone_name ?? item.zone_name;
+          item.worker_id = a?.worker_id ?? item.worker_id;
+          item.zone_id   = a?.zone_id   ?? item.zone_id;
+          this.cdr.markForCheck();
+        },
+        error: () => {},
+      });
+    }
   }
 
   private playAlert(): void {
@@ -92,14 +114,6 @@ export class Sensors implements OnInit, OnDestroy {
 
   formatType(t: string): string {
     return t.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-  }
-
-  trackByStatKey(index: number, stat: any): string {
-    return stat.key;
-  }
-
-  trackByItemId(index: number, item: any): string {
-    return item.id;
   }
 
   ngOnDestroy(): void { this.disconnect(); }

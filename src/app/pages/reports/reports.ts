@@ -145,7 +145,7 @@ export class Reports implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(z => {
         this.zoneData = {
-          labels: z.map(x => x.zone),
+          labels: z.map(x => x.zone_name),
           datasets: [{ data: z.map(x => x.count), backgroundColor: ZONE_PALETTE, borderWidth: 0 }],
         };
         this.cdr.markForCheck();

@@ -55,6 +55,7 @@
             <th>Type</th>
             <th>Description</th>
             <th>Status</th>
+            <th>Worker</th>
             <th>Zone</th>
             <th>Time</th>
             <th>Actions</th>
@@ -67,7 +68,8 @@
               <td class="cell-type">{{formatType(a.alert_type)}}</td>
               <td class="cell-desc">{{a.description || '—'}}</td>
               <td><span class="badge badge-{{a.status}}">{{a.status}}</span></td>
-              <td class="cell-zone">{{a.zone_id ? a.zone_id.slice(0,8)+'…' : '—'}}</td>
+              <td class="cell-worker">{{workerName(a.worker_id)}}</td>
+              <td class="cell-zone">{{zoneName(a.zone_id)}}</td>
               <td class="cell-time">{{a.created_at | date:'MMM d, HH:mm'}}</td>
               <td>
                 <div class="actions">

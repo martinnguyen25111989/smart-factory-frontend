@@ -22,7 +22,7 @@ export interface AlertSummary {
   low: number;
 }
 
-export interface ZoneStat { zone: string; count: number; }
+export interface ZoneStat { zone_name: string; count: number; }
 export interface DailyTrend { day: string; count: number; }
 export interface PpeStat { type: string; count: number; }
 

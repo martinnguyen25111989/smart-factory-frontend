@@ -56,7 +56,8 @@
               }
             </div>
             <div class="item-desc">{{item.description || 'No description'}}</div>
-            <div class="item-zone">📍 Zone: {{item.zone_id ? item.zone_id.slice(0,8)+'…' : 'Unknown'}}</div>
+            <div class="item-zone">📍 Zone: {{ item.zone_name || (item.zone_id ? '#' + item.zone_id.slice(0,8) : 'Unknown') }}</div>
+            <div class="item-worker">👤 Worker: {{ item.full_name || (item.worker_id ? '#' + item.worker_id.slice(0,8) : 'Unknown') }}</div>
           </div>
           <div class="item-right">
             <div class="item-time">{{item.time | date:'HH:mm:ss'}}</div>
