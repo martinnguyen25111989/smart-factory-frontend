@@ -19,50 +19,58 @@
   </div>
 
   <!-- Stat cards -->
-  <div class="stat-grid" *ngIf="summary">
-    <div class="stat-card">
-      <span class="ico">🔔</span>
-      <div class="lbl">Total</div>
-      <div class="num" style="color:#818cf8">{{summary.total}}</div>
+  @if (summary) {
+    <div class="stat-grid">
+      <div class="stat-card">
+        <span class="ico">🔔</span>
+        <div class="lbl">Total</div>
+        <div class="num" style="color:#818cf8">{{summary.total}}</div>
+      </div>
+      <div class="stat-card">
+        <span class="ico">🟡</span>
+        <div class="lbl">Open</div>
+        <div class="num" style="color:#60a5fa">{{summary.open}}</div>
+      </div>
+      <div class="stat-card">
+        <span class="ico">🔴</span>
+        <div class="lbl">Critical</div>
+        <div class="num" style="color:#f87171">{{summary.critical}}</div>
+      </div>
+      <div class="stat-card">
+        <span class="ico">🟠</span>
+        <div class="lbl">High</div>
+        <div class="num" style="color:#fbbf24">{{summary.high}}</div>
+      </div>
+      <div class="stat-card">
+        <span class="ico">🔵</span>
+        <div class="lbl">Medium</div>
+        <div class="num" style="color:#60a5fa">{{summary.medium}}</div>
+      </div>
+      <div class="stat-card">
+        <span class="ico">🟢</span>
+        <div class="lbl">Low</div>
+        <div class="num" style="color:#4ade80">{{summary.low}}</div>
+      </div>
     </div>
-    <div class="stat-card">
-      <span class="ico">🟡</span>
-      <div class="lbl">Open</div>
-      <div class="num" style="color:#60a5fa">{{summary.open}}</div>
-    </div>
-    <div class="stat-card">
-      <span class="ico">🔴</span>
-      <div class="lbl">Critical</div>
-      <div class="num" style="color:#f87171">{{summary.critical}}</div>
-    </div>
-    <div class="stat-card">
-      <span class="ico">🟠</span>
-      <div class="lbl">High</div>
-      <div class="num" style="color:#fbbf24">{{summary.high}}</div>
-    </div>
-    <div class="stat-card">
-      <span class="ico">🔵</span>
-      <div class="lbl">Medium</div>
-      <div class="num" style="color:#60a5fa">{{summary.medium}}</div>
-    </div>
-    <div class="stat-card">
-      <span class="ico">🟢</span>
-      <div class="lbl">Low</div>
-      <div class="num" style="color:#4ade80">{{summary.low}}</div>
-    </div>
-  </div>
+  }
 
   <!-- Charts -->
   <div class="chart-grid">
     <div class="chart-card">
       <div class="chart-title"><span class="dot"></span> Alert Trend (30 days)</div>
-      <canvas baseChart [data]="trendData" [options]="lineOpts" type="line" style="max-height:200px" *ngIf="trendData.datasets[0].data.length"></canvas>
-      <div class="empty" *ngIf="!trendData.datasets[0].data.length">No trend data yet</div>
+      @if (trendData.datasets[0].data.length) {
+        <canvas baseChart [data]="trendData" [options]="lineOpts" type="line" style="max-height:200px"></canvas>
+      } @else {
+        <div class="empty">No trend data yet</div>
+      }
     </div>
     <div class="chart-card">
       <div class="chart-title"><span class="dot" style="background:#f59e0b"></span> Alerts by Zone</div>
-      <canvas baseChart [data]="zoneData" [options]="pieOpts" type="doughnut" style="max-height:200px" *ngIf="zoneData.datasets[0].data.length"></canvas>
-      <div class="empty" *ngIf="!zoneData.datasets[0].data.length">No zone data yet</div>
+      @if (zoneData.datasets[0].data.length) {
+        <canvas baseChart [data]="zoneData" [options]="pieOpts" type="doughnut" style="max-height:200px"></canvas>
+      } @else {
+        <div class="empty">No zone data yet</div>
+      }
     </div>
   </div>
 
@@ -73,18 +81,20 @@
       <a class="view-all" [routerLink]="'/alerts'">View all →</a>
     </div>
 
-    <div class="feed-item sev-{{a.severity}}" *ngFor="let a of recentAlerts; trackBy: trackByAlertId">
-      <div>
-        <div class="feed-type">
-          <span class="badge badge-{{a.severity}}" style="margin-right:8px">{{a.severity}}</span>
-          {{formatType(a.alert_type)}}
+    @for (a of recentAlerts; track a.id) {
+      <div class="feed-item sev-{{a.severity}}">
+        <div>
+          <div class="feed-type">
+            <span class="badge badge-{{a.severity}}" style="margin-right:8px">{{a.severity}}</span>
+            {{formatType(a.alert_type)}}
+          </div>
+          <div class="feed-desc">{{a.description}}</div>
         </div>
-        <div class="feed-desc">{{a.description}}</div>
+        <div class="feed-time">{{a.created_at | date:'MM/dd/yyyy HH:mm:ss'}}</div>
       </div>
-     <div class="feed-time">{{a.created_at | date:'MM/dd/yyyy HH:mm:ss'}}</div>
-    </div>
-
-    <div class="empty" *ngIf="!recentAlerts.length">🎉 No alerts — all clear</div>
+    } @empty {
+      <div class="empty">🎉 No alerts — all clear</div>
+    }
   </div>
 
 </div>

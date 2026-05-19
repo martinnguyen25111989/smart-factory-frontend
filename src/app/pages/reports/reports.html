@@ -1,35 +1,80 @@
 <div class="page">
+
   <!-- Header -->
   <div class="header">
     <div>
-      <h1>📊 Reports</h1>
-      <p>Analytics and compliance reporting</p>
+      <h1>📊 Reports & Analytics</h1>
+      <p>Alert statistics, trends and export tools</p>
     </div>
-    <button class="btn-refresh" (click)="load()">↻ Refresh</button>
+    <div class="export-btns">
+      <button class="btn-export btn-excel" (click)="reportSvc.exportExcel(days)">
+        📥 Export Excel
+      </button>
+      <button class="btn-export btn-pdf" (click)="reportSvc.exportPdf(days)">
+        📄 Export PDF
+      </button>
+    </div>
   </div>
 
-  <!-- Content -->
-  <div class="loading" *ngIf="loading">
-    <div class="spinner"></div> Loading reports…
+  <!-- Day filters -->
+  <div class="day-filters">
+    @for (d of dayOptions; track d) {
+      <button class="day-btn" [class.active]="days === d" (click)="setDays(d)">
+        {{ d }}d
+      </button>
+    }
   </div>
-  <ng-container *ngIf="!loading">
-    <div class="card">
-      <div class="reports-list" *ngIf="reports.length">
-        <div class="report-item" *ngFor="let report of reports; trackBy: trackByReportId">
-          <div class="report-header">
-            <div class="report-title">{{report.title}}</div>
-            <span class="report-date">{{report.date | date:'MMM d, yyyy'}}</span>
-          </div>
-          <div class="report-details">
-            <span class="detail-badge">{{report.type}}</span>
-            <span class="detail-count">{{report.events}} events</span>
-          </div>
+
+  <!-- Summary cards -->
+  @if (summary) {
+    <div class="summary-grid">
+      @for (c of summaryCards; track c.label) {
+        <div class="sum-card" [ngClass]="c.cls">
+          <div class="sum-lbl">{{ c.label }}</div>
+          <div class="sum-val" [style.color]="c.color">{{ c.value }}</div>
         </div>
-      </div>
-      <div class="empty" *ngIf="!reports.length">
-        <div class="ico">📊</div>
-        <p>No reports available</p>
-      </div>
+      }
     </div>
-  </ng-container>
+  }
+
+  <!-- Charts row 1 -->
+  <div class="chart-row">
+    <div class="chart-card">
+      <div class="chart-title">
+        <span class="dot" style="background:#4f52e8"></span>
+        Daily Alert Trend
+      </div>
+      @if (trendData.datasets[0].data.length) {
+        <canvas baseChart [data]="trendData" [options]="barOpts" type="bar" style="max-height:240px"></canvas>
+      } @else {
+        <div class="empty">No trend data</div>
+      }
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-title">
+        <span class="dot" style="background:#f59e0b"></span>
+        Alerts by Zone
+      </div>
+      @if (zoneData.datasets[0].data.length) {
+        <canvas baseChart [data]="zoneData" [options]="pieOpts" type="doughnut" style="max-height:240px"></canvas>
+      } @else {
+        <div class="empty">No zone data</div>
+      }
+    </div>
+  </div>
+
+  <!-- PPE chart full width -->
+  <div class="chart-card">
+    <div class="chart-title">
+      <span class="dot" style="background:#f87171"></span>
+      PPE Compliance Violations
+    </div>
+    @if (ppeData.datasets[0].data.length) {
+      <canvas baseChart [data]="ppeData" [options]="hbarOpts" type="bar" style="max-height:200px"></canvas>
+    } @else {
+      <div class="empty">No PPE violation data</div>
+    }
+  </div>
+
 </div>

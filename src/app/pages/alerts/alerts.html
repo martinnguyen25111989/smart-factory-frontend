@@ -42,10 +42,11 @@
   </div>
 
   <!-- Table -->
-  <div *ngIf="loading" class="loading">
-    <div class="spinner"></div> Loading alerts…
-  </div>
-  <ng-container *ngIf="!loading">
+  @if (loading) {
+    <div class="loading">
+      <div class="spinner"></div> Loading alerts…
+    </div>
+  } @else {
     <div class="table-wrap">
       <table>
         <thead>
@@ -60,46 +61,58 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let a of alerts; trackBy: trackByAlertId">
-            <td><span class="badge badge-{{a.severity}}">{{a.severity}}</span></td>
-            <td class="cell-type">{{formatType(a.alert_type)}}</td>
-            <td class="cell-desc">{{a.description || '—'}}</td>
-            <td><span class="badge badge-{{a.status}}">{{a.status}}</span></td>
-            <td class="cell-zone">{{a.zone_id ? a.zone_id.slice(0,8)+'…' : '—'}}</td>
-            <td class="cell-time">{{a.created_at | date:'MMM d, HH:mm'}}</td>
-            <td>
-              <div class="actions">
-                <button class="act-btn act-ack" (click)="acknowledge(a)" *ngIf="a.status === 'open'">👍 Ack</button>
-                <button class="act-btn act-done" (click)="resolve(a)" *ngIf="a.status !== 'resolved'">✓ Resolve</button>
-              </div>
-            </td>
-          </tr>
+          @for (a of alerts; track a.id) {
+            <tr>
+              <td><span class="badge badge-{{a.severity}}">{{a.severity}}</span></td>
+              <td class="cell-type">{{formatType(a.alert_type)}}</td>
+              <td class="cell-desc">{{a.description || '—'}}</td>
+              <td><span class="badge badge-{{a.status}}">{{a.status}}</span></td>
+              <td class="cell-zone">{{a.zone_id ? a.zone_id.slice(0,8)+'…' : '—'}}</td>
+              <td class="cell-time">{{a.created_at | date:'MMM d, HH:mm'}}</td>
+              <td>
+                <div class="actions">
+                  @if (a.status === 'open') {
+                    <button class="act-btn act-ack" (click)="acknowledge(a)">👍 Ack</button>
+                  }
+                  @if (a.status !== 'resolved') {
+                    <button class="act-btn act-done" (click)="resolve(a)">✓ Resolve</button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
         </tbody>
       </table>
 
-      <div class="empty" *ngIf="!alerts.length">
-        <div class="ico">🎉</div>
-        <p>No alerts found</p>
-      </div>
+      @if (!alerts.length) {
+        <div class="empty">
+          <div class="ico">🎉</div>
+          <p>No alerts found</p>
+        </div>
+      }
     </div>
 
     <!-- Pagination -->
-    <div class="pagination" *ngIf="totalPages > 1">
-      <button class="pag-btn" [disabled]="currentPage === 1" (click)="prevPage()">← Prev</button>
-      
-      <div class="pag-buttons">
-        <button class="pag-btn" *ngFor="let page of getPageNumbers(); trackBy: trackByPage" 
-          [class.active]="currentPage === page" (click)="goToPage(page)">
-          {{page}}
-        </button>
-      </div>
+    @if (totalPages > 1) {
+      <div class="pagination">
+        <button class="pag-btn" [disabled]="currentPage === 1" (click)="prevPage()">← Prev</button>
 
-      <button class="pag-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">Next →</button>
-      
-      <div class="pag-info">
-        Page {{currentPage}} of {{totalPages}}
+        <div class="pag-buttons">
+          @for (page of getPageNumbers(); track page) {
+            <button class="pag-btn"
+              [class.active]="currentPage === page" (click)="goToPage(page)">
+              {{page}}
+            </button>
+          }
+        </div>
+
+        <button class="pag-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">Next →</button>
+
+        <div class="pag-info">
+          Page {{currentPage}} of {{totalPages}}
+        </div>
       </div>
-    </div>
-  </ng-container>
+    }
+  }
 
 </div>

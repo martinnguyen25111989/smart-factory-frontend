@@ -21,19 +21,21 @@
         </div>
       </div>
 
-      <div *ngFor="let z of zones" class="zone-card">
-        <div>
-          <div class="zone-name">{{z.name}}</div>
-          <div class="zone-loc">📍 {{z.location || 'No location set'}}</div>
+      @for (z of zones; track z.id) {
+        <div class="zone-card">
+          <div>
+            <div class="zone-name">{{z.name}}</div>
+            <div class="zone-loc">📍 {{z.location || 'No location set'}}</div>
+          </div>
+          <span class="badge"
+            [class.badge-active]="z.is_active"
+            [class.badge-inactive]="!z.is_active">
+            {{z.is_active ? '● Active' : '○ Inactive'}}
+          </span>
         </div>
-        <span class="badge"
-          [class.badge-active]="z.is_active"
-          [class.badge-inactive]="!z.is_active">
-          {{z.is_active ? '● Active' : '○ Inactive'}}
-        </span>
-      </div>
-
-      <div *ngIf="!zones.length" class="empty">No zones found</div>
+      } @empty {
+        <div class="empty">No zones found</div>
+      }
     </div>
 
     <!-- Shifts -->
@@ -46,82 +48,88 @@
         <button class="btn-sm" (click)="showShiftDialog=true">＋ Add Shift</button>
       </div>
 
-      <div *ngFor="let s of shifts" class="shift-card">
-        <div style="flex:1">
-          <div class="shift-name">{{s.name}}</div>
-          <div class="shift-time">⏰ {{s.start_time}} – {{s.end_time}}</div>
-          <div class="shift-bar-wrap">
-            <div class="shift-bar"
-              [style.width]="shiftPercent(s.start_time, s.end_time) + '%'">
+      @for (s of shifts; track s.id) {
+        <div class="shift-card">
+          <div style="flex:1">
+            <div class="shift-name">{{s.name}}</div>
+            <div class="shift-time">⏰ {{s.start_time}} – {{s.end_time}}</div>
+            <div class="shift-bar-wrap">
+              <div class="shift-bar"
+                [style.width]="shiftPercent(s.start_time, s.end_time) + '%'">
+              </div>
             </div>
           </div>
+          <span class="badge badge-hours" style="margin-left:14px">
+            {{calcHours(s.start_time, s.end_time)}}h
+          </span>
         </div>
-        <span class="badge badge-hours" style="margin-left:14px">
-          {{calcHours(s.start_time, s.end_time)}}h
-        </span>
-      </div>
-
-      <div *ngIf="!shifts.length" class="empty">No shifts found</div>
+      } @empty {
+        <div class="empty">No shifts found</div>
+      }
     </div>
 
   </div>
 
   <!-- Zone Dialog -->
-  <div class="overlay" *ngIf="showZoneDialog" (click)="showZoneDialog=false">
-    <div class="dialog" (click)="$event.stopPropagation()">
-      <div class="dialog-title">
-        🏭 Add Zone
-        <button class="btn-close" (click)="showZoneDialog=false">×</button>
+  @if (showZoneDialog) {
+    <div class="overlay" (click)="showZoneDialog=false">
+      <div class="dialog" (click)="$event.stopPropagation()">
+        <div class="dialog-title">
+          🏭 Add Zone
+          <button class="btn-close" (click)="showZoneDialog=false">×</button>
+        </div>
+        <form [formGroup]="zoneForm">
+          <div class="field">
+            <label>Zone Name *</label>
+            <input formControlName="name" placeholder="e.g. Zone A — Assembly Line">
+          </div>
+          <div class="field">
+            <label>Location</label>
+            <input formControlName="location" placeholder="e.g. Building 1, Floor 2">
+          </div>
+          <div class="field">
+            <label>Description</label>
+            <input formControlName="description" placeholder="Optional description">
+          </div>
+          <div class="dialog-footer">
+            <button class="btn-cancel" type="button" (click)="showZoneDialog=false">Cancel</button>
+            <button class="btn-save" type="button" (click)="saveZone()" [disabled]="zoneForm.invalid">Create Zone</button>
+          </div>
+        </form>
       </div>
-      <form [formGroup]="zoneForm">
-        <div class="field">
-          <label>Zone Name *</label>
-          <input formControlName="name" placeholder="e.g. Zone A — Assembly Line">
-        </div>
-        <div class="field">
-          <label>Location</label>
-          <input formControlName="location" placeholder="e.g. Building 1, Floor 2">
-        </div>
-        <div class="field">
-          <label>Description</label>
-          <input formControlName="description" placeholder="Optional description">
-        </div>
-        <div class="dialog-footer">
-          <button class="btn-cancel" type="button" (click)="showZoneDialog=false">Cancel</button>
-          <button class="btn-save" type="button" (click)="saveZone()" [disabled]="zoneForm.invalid">Create Zone</button>
-        </div>
-      </form>
     </div>
-  </div>
+  }
 
   <!-- Shift Dialog -->
-  <div class="overlay" *ngIf="showShiftDialog" (click)="showShiftDialog=false">
-    <div class="dialog" (click)="$event.stopPropagation()">
-      <div class="dialog-title">
-        ⏰ Add Shift
-        <button class="btn-close" (click)="showShiftDialog=false">×</button>
+  @if (showShiftDialog) {
+    <div class="overlay" (click)="showShiftDialog=false">
+      <div class="dialog" (click)="$event.stopPropagation()">
+        <div class="dialog-title">
+          ⏰ Add Shift
+          <button class="btn-close" (click)="showShiftDialog=false">×</button>
+        </div>
+        <form [formGroup]="shiftForm">
+          <div class="field">
+            <label>Shift Name *</label>
+            <input formControlName="name" placeholder="e.g. Morning Shift">
+          </div>
+          <div class="field-row">
+            <div class="field" style="margin-bottom:0">
+              <label>Start Time *</label>
+              <input type="time" formControlName="start_time" placeholder="06:00">
+            </div>
+            <div class="field" style="margin-bottom:0">
+              <label>End Time *</label>
+              <input type="time" formControlName="end_time" placeholder="14:00">
+            </div>
+          </div>
+          <div class="dialog-footer">
+            <button class="btn-cancel" type="button" (click)="showShiftDialog=false">Cancel</button>
+            <button class="btn-save" type="button" (click)="saveShift()" [disabled]="shiftForm.invalid">Create Shift</button>
+          </div>
+        </form>
       </div>
-      <form [formGroup]="shiftForm">
-        <div class="field">
-          <label>Shift Name *</label>
-          <input formControlName="name" placeholder="e.g. Morning Shift">
-        </div>
-        <div class="field-row">
-          <div class="field" style="margin-bottom:0">
-            <label>Start Time *</label>
-            <input type="time" formControlName="start_time" placeholder="06:00">
-          </div>
-          <div class="field" style="margin-bottom:0">
-            <label>End Time *</label>
-            <input type="time" formControlName="end_time" placeholder="14:00">
-          </div>
-        </div>
-        <div class="dialog-footer">
-          <button class="btn-cancel" type="button" (click)="showShiftDialog=false">Cancel</button>
-          <button class="btn-save" type="button" (click)="saveShift()" [disabled]="shiftForm.invalid">Create Shift</button>
-        </div>
-      </form>
     </div>
-  </div>
+  }
 
 </div>

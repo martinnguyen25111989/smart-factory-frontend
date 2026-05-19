@@ -9,6 +9,7 @@ export interface Alert {
   status: AlertStatus;
   description: string | null;
   zone_id: string | null;
+  worker_id : string | null;
   created_at: string;
 }
 

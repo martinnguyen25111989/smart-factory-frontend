@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "smart-factory-frontend-plugins",
+  "version": "0.1.0",
+  "description": "Local plugins for the PPE Alert System frontend project.",
+  "plugins": [
+    {
+      "name": "my-plugin",
+      "path": "./my-plugin",
+      "enabled": true
+    }
+  ]
+}

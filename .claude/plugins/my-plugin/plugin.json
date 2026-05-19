@@ -1,0 +1,9 @@
+{
+  "name": "my-plugin",
+  "version": "0.1.0",
+  "description": "Local plugin scaffold for smart-factory-frontend.",
+  "entry": "./index.js",
+  "commands": [],
+  "skills": [],
+  "agents": []
+}

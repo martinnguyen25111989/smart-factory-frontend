@@ -1,0 +1,62 @@
+.export-btns { display:flex; gap:8px; }
+    .btn-export {
+      padding:8px 16px; border-radius:9px;
+      border:1px solid; background:none;
+      font-size:12px; font-weight:600;
+      cursor:pointer; font-family:inherit; transition:all 0.15s;
+    }
+    .btn-excel { border-color:#14532d; color:#4ade80; }
+    .btn-excel:hover { background:#0a2018; }
+    .btn-pdf   { border-color:#3d1010; color:#f87171; }
+    .btn-pdf:hover   { background:#2d0f0f; }
+
+    /* Day filters */
+    .day-filters { display:flex; gap:7px; margin-bottom:20px; }
+    .day-btn {
+      padding:6px 18px; border-radius:20px;
+      background:#0d1117; border:1px solid #161d2e;
+      color:#475569; font-size:12px; font-weight:600;
+      cursor:pointer; font-family:inherit; transition:all 0.15s;
+      min-width:56px; text-align:center;
+    }
+    .day-btn:hover { border-color:#2d3462; color:#94a3b8; }
+    .day-btn.active { background:#1a1d4a; border-color:#4f52e8; color:#818cf8; }
+
+    /* Summary cards */
+    .summary-grid {
+      display:grid; grid-template-columns:repeat(6,1fr);
+      gap:10px; margin-bottom:18px;
+    }
+    .sum-card {
+      background:#0d1117; border:1px solid #161d2e;
+      border-radius:12px; padding:14px 16px;
+      position:relative; overflow:hidden;
+    }
+    .sum-card::after {
+      content:''; position:absolute;
+      top:0; left:0; right:0; height:2px;
+    }
+    .sum-card.c-purple::after { background:#4f52e8; }
+    .sum-card.c-blue::after   { background:#3b82f6; }
+    .sum-card.c-red::after    { background:#ef4444; }
+    .sum-card.c-amber::after  { background:#f59e0b; }
+    .sum-card.c-sky::after    { background:#38bdf8; }
+    .sum-card.c-green::after  { background:#22c55e; }
+    .sum-lbl { font-size:10px; font-weight:600; color:#334155; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:6px; }
+    .sum-val { font-size:28px; font-weight:700; line-height:1; }
+
+    /* Charts */
+    .chart-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+    .chart-card {
+      background:#0d1117; border:1px solid #161d2e;
+      border-radius:14px; padding:18px 20px;
+    }
+    .chart-title {
+      font-size:12px; font-weight:700; color:#334155;
+      text-transform:uppercase; letter-spacing:0.6px;
+      margin-bottom:16px; display:flex; align-items:center; gap:7px;
+    }
+    .chart-title .dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+
+    /* Empty */
+    .empty { text-align:center; padding:40px; color:#1e2640; font-size:13px; }

@@ -21,13 +21,15 @@
 
   <!-- Stats -->
   <div class="stats-row">
-    <div class="stat-pill" *ngFor="let s of stats; trackBy: trackByStatKey">
-      <span class="sev-dot" [style.background]="s.color"></span>
-      <div>
-        <div class="sev-label">{{s.key}}</div>
-        <div class="sev-count" [style.color]="s.color">{{s.count}}</div>
+    @for (s of stats; track s.key) {
+      <div class="stat-pill">
+        <span class="sev-dot" [style.background]="s.color"></span>
+        <div>
+          <div class="sev-label">{{s.key}}</div>
+          <div class="sev-count" [style.color]="s.color">{{s.count}}</div>
+        </div>
       </div>
-    </div>
+    }
     <div class="total-pill">
       <span class="lbl">Total events</span>
       <span class="num">{{feed.length}}</span>
@@ -43,27 +45,31 @@
     </div>
 
     <div class="feed-list">
-      <div class="empty" *ngIf="!feed.length">
-        <div class="ico">📭</div>
-        <div class="msg">Waiting for sensor events…</div>
-        <div class="hint">Make sure sensors are publishing to Kafka → sensor-events topic</div>
-      </div>
-
-      <div class="feed-item sev-{{item.severity}}" *ngFor="let item of feed; trackBy: trackByItemId" [class.is-new]="item.isNew">
-        <div class="item-left">
-          <div class="item-row1">
-            <span class="badge badge-{{item.severity}}">{{item.severity}}</span>
-            <span class="item-type">{{formatType(item.alert_type)}}</span>
-            <span class="new-tag" *ngIf="item.isNew">NEW</span>
+      @for (item of feed; track item.id) {
+        <div class="feed-item sev-{{item.severity}}" [class.is-new]="item.isNew">
+          <div class="item-left">
+            <div class="item-row1">
+              <span class="badge badge-{{item.severity}}">{{item.severity}}</span>
+              <span class="item-type">{{formatType(item.alert_type)}}</span>
+              @if (item.isNew) {
+                <span class="new-tag">NEW</span>
+              }
+            </div>
+            <div class="item-desc">{{item.description || 'No description'}}</div>
+            <div class="item-zone">📍 Zone: {{item.zone_id ? item.zone_id.slice(0,8)+'…' : 'Unknown'}}</div>
           </div>
-          <div class="item-desc">{{item.description || 'No description'}}</div>
-          <div class="item-zone">📍 Zone: {{item.zone_id ? item.zone_id.slice(0,8)+'…' : 'Unknown'}}</div>
+          <div class="item-right">
+            <div class="item-time">{{item.time | date:'HH:mm:ss'}}</div>
+            <div class="item-date">{{item.time | date:'MMM d'}}</div>
+          </div>
         </div>
-        <div class="item-right">
-          <div class="item-time">{{item.time | date:'HH:mm:ss'}}</div>
-          <div class="item-date">{{item.time | date:'MMM d'}}</div>
+      } @empty {
+        <div class="empty">
+          <div class="ico">📭</div>
+          <div class="msg">Waiting for sensor events…</div>
+          <div class="hint">Make sure sensors are publishing to Kafka → sensor-events topic</div>
         </div>
-      </div>
+      }
     </div>
   </div>
 
